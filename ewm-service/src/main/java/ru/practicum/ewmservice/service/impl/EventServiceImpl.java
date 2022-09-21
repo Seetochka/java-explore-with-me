@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import ru.practicum.ewmservice.client.EventClient;
 import ru.practicum.ewmservice.dto.ViewStats;
+import ru.practicum.ewmservice.enums.CommentStatus;
 import ru.practicum.ewmservice.enums.EventSort;
 import ru.practicum.ewmservice.enums.EventState;
 import ru.practicum.ewmservice.enums.ParticipationRequestStatus;
@@ -19,6 +20,7 @@ import ru.practicum.ewmservice.exception.UserHaveNoRightsException;
 import ru.practicum.ewmservice.model.Event;
 import ru.practicum.ewmservice.model.ParticipationRequest;
 import ru.practicum.ewmservice.model.User;
+import ru.practicum.ewmservice.repository.CommentRepository;
 import ru.practicum.ewmservice.repository.EventRepository;
 import ru.practicum.ewmservice.repository.ParticipationRequestsRepository;
 import ru.practicum.ewmservice.service.CategoryService;
@@ -50,6 +52,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
 
     private final EventRepository eventRepository;
     private final ParticipationRequestsRepository participationRequestsRepository;
+    private final CommentRepository commentRepository;
 
     private final EventClient eventClient;
 
@@ -524,6 +527,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         event.setConfirmedRequests(participationRequestService.getCountParticipantByEventId(event.getId()));
+        event.setComments(commentRepository.findAllByStatusAndEventId(CommentStatus.PUBLISHED, event.getId()));
 
         return event;
     }

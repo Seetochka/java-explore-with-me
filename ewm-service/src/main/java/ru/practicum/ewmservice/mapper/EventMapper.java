@@ -3,9 +3,12 @@ package ru.practicum.ewmservice.mapper;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewmservice.dto.*;
 import ru.practicum.ewmservice.model.Category;
+import ru.practicum.ewmservice.model.Comment;
 import ru.practicum.ewmservice.model.Event;
 
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class EventMapper {
@@ -26,7 +29,8 @@ public class EventMapper {
                 event.getPublishedOn(),
                 event.getRequestModeration(),
                 event.getState(),
-                event.getViews()
+                event.getViews(),
+                event.getComments().stream().map(this::toEventFullDtoComment).collect(Collectors.toList())
         );
     }
 
@@ -63,7 +67,8 @@ public class EventMapper {
                 null,
                 null,
                 null,
-                0
+                0,
+                new ArrayList<>()
         );
     }
 
@@ -86,7 +91,8 @@ public class EventMapper {
                 null,
                 null,
                 null,
-                0
+                0,
+                new ArrayList<>()
         );
     }
 
@@ -109,7 +115,17 @@ public class EventMapper {
                 null,
                 null,
                 null,
-                0
+                0,
+                new ArrayList<>()
+        );
+    }
+
+    private EventFullDto.Comment toEventFullDtoComment(Comment comment) {
+        return new EventFullDto.Comment(
+                comment.getId(),
+                comment.getContent(),
+                new EventFullDto.User(comment.getUser().getId(), comment.getUser().getName()),
+                comment.getCreated()
         );
     }
 }

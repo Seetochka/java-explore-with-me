@@ -6,6 +6,8 @@ import ru.practicum.ewmservice.enums.EventState;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -45,6 +47,9 @@ public class Event {
     private Integer confirmedRequests;
     @Transient
     private long views;
+    @OneToMany()
+    @JoinColumn(name = "event_id")
+    private Collection<Comment> comments = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

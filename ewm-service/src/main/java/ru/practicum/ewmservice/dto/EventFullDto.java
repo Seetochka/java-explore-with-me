@@ -8,6 +8,8 @@ import ru.practicum.ewmservice.enums.EventState;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * DTO события
@@ -41,6 +43,7 @@ public class EventFullDto {
     private Boolean requestModeration;
     private EventState state;
     private Long views;
+    private Collection<Comment> comments = new ArrayList<>();
 
     @Data
     @NoArgsConstructor
@@ -67,5 +70,15 @@ public class EventFullDto {
     public static class Location {
         private Float lat;
         private Float lon;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Comment {
+        private Long id;
+        private String content;
+        private User user;
+        private LocalDateTime created;
     }
 }
