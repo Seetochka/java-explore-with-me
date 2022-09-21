@@ -7,6 +7,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.practicum.ewmservice.clients.EventClient;
+import ru.practicum.ewmservice.dto.ViewStats;
 import ru.practicum.ewmservice.enums.EventSort;
 import ru.practicum.ewmservice.enums.EventState;
 import ru.practicum.ewmservice.enums.ParticipationRequestStatus;
@@ -30,6 +32,7 @@ import javax.persistence.criteria.Subquery;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +48,8 @@ public class EventServiceImpl implements EventService, PageTrait {
 
     private final EventRepository eventRepository;
     private final ParticipationRequestsRepository participationRequestsRepository;
+
+    private final EventClient eventClient;
 
     @Override
     public Event create(long userId, Event event) throws ObjectNotFountException {
@@ -491,6 +496,17 @@ public class EventServiceImpl implements EventService, PageTrait {
     }
 
     private Event prepareEvent(Event event) {
+        Collection<ViewStats> viewStats = eventClient.getStats(List.of("/events/" + event.getId()));
+
+        if (!viewStats.isEmpty()) {
+            event.setViews(
+                    viewStats.stream()
+                            .findFirst()
+                            .get()
+                            .getHits()
+            );
+        }
+
         event.setConfirmedRequests(participationRequestService.getCountParticipantByEventId(event.getId()));
 
         return event;

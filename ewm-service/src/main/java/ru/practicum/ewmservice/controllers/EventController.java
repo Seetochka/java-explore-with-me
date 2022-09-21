@@ -3,6 +3,7 @@ package ru.practicum.ewmservice.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewmservice.clients.EventClient;
 import ru.practicum.ewmservice.dto.*;
 import ru.practicum.ewmservice.enums.EventSort;
 import ru.practicum.ewmservice.exceptions.EventStateException;
@@ -30,6 +31,8 @@ public class EventController {
     private final EventMapper eventMapper;
     private final ParticipationRequestMapper participationRequestMapper;
 
+    private final EventClient eventClient;
+
     @GetMapping(path = "/events")
     public Collection<EventShortDto> getByParams(@RequestParam String text,
                                                  @RequestParam Collection<Long> categories,
@@ -49,6 +52,8 @@ public class EventController {
         Collection<Event> events = eventService.getByParamsForUser(text, categories, paid, rangeStart, rangeEnd,
                 onlyAvailable, sort, from, size);
 
+        eventClient.createStat(httpRequest);
+
         return events.stream()
                 .map(eventMapper::toEventShortDto)
                 .collect(Collectors.toList());
@@ -57,6 +62,8 @@ public class EventController {
     @GetMapping("/events/{id}")
     public EventFullDto getById(@PathVariable long id, HttpServletRequest httpRequest) throws ObjectNotFountException {
         Event event = eventService.getById(id);
+
+        eventClient.createStat(httpRequest);
 
         return eventMapper.toEventFullDto(event);
     }
