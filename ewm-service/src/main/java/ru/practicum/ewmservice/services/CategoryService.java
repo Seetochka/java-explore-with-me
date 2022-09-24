@@ -9,7 +9,7 @@ public interface CategoryService {
     Category create(Category category);
 
     Category update(Category category) throws ObjectNotFountException;
-    
+
     void delete(long id) throws ObjectNotFountException;
 
     Category getById(long id) throws ObjectNotFountException;

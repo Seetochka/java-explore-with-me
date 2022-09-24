@@ -61,7 +61,7 @@ public class BaseClient {
         return headers;
     }
 
-    private static <Object> ResponseEntity<Object> prepareStatResponse(ResponseEntity<Object> response) {
+    private static <T> ResponseEntity<T> prepareStatResponse(ResponseEntity<T> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }
