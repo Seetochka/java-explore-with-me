@@ -8,7 +8,6 @@ import ru.practicum.ewmservice.exceptions.UserHaveNoRightsException;
 import ru.practicum.ewmservice.models.Event;
 import ru.practicum.ewmservice.models.ParticipationRequest;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 public interface EventService {
@@ -30,10 +29,10 @@ public interface EventService {
     ParticipationRequest rejectParticipationRequest(long userId, long eventId, long reqId) throws ObjectNotFountException;
 
     Collection<Event> getByParamsForAdmin(Collection<Long> users, Collection<EventState> states, Collection<Long> categories,
-                                          LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size);
+                                          String rangeStart, String rangeEnd, int from, int size);
 
     Collection<Event> getByParamsForUser(String text, Collection<Long> categories, Boolean paid,
-                                         LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable,
+                                         String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                          EventSort sort, int from, int size);
 
     Event getById(long id) throws ObjectNotFountException;

@@ -1,7 +1,6 @@
 package ru.practicum.ewmservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.clients.EventClient;
 import ru.practicum.ewmservice.dto.*;
@@ -16,7 +15,6 @@ import ru.practicum.ewmservice.services.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -37,12 +35,8 @@ public class EventController {
     public Collection<EventShortDto> getByParams(@RequestParam String text,
                                                  @RequestParam Collection<Long> categories,
                                                  @RequestParam Boolean paid,
-                                                 @RequestParam
-                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                 LocalDateTime rangeStart,
-                                                 @RequestParam
-                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                 LocalDateTime rangeEnd,
+                                                 @RequestParam String rangeStart,
+                                                 @RequestParam String rangeEnd,
                                                  @RequestParam Boolean onlyAvailable,
                                                  @RequestParam EventSort sort,
                                                  @RequestParam(defaultValue = "0") int from,

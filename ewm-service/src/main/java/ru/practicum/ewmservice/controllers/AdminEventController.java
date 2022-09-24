@@ -1,7 +1,6 @@
 package ru.practicum.ewmservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.dto.AdminUpdateEventRequestDto;
 import ru.practicum.ewmservice.dto.EventFullDto;
@@ -11,7 +10,6 @@ import ru.practicum.ewmservice.mappers.EventMapper;
 import ru.practicum.ewmservice.models.Event;
 import ru.practicum.ewmservice.services.EventService;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -29,12 +27,8 @@ public class AdminEventController {
     public Collection<EventFullDto> getByParams(@RequestParam(required = false) Collection<Long> users,
                                                 @RequestParam(required = false) Collection<EventState> states,
                                                 @RequestParam(required = false) Collection<Long> categories,
-                                                @RequestParam(required = false)
-                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                LocalDateTime rangeStart,
-                                                @RequestParam(required = false)
-                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                LocalDateTime rangeEnd,
+                                                @RequestParam(required = false) String rangeStart,
+                                                @RequestParam(required = false) String rangeEnd,
                                                 @RequestParam(defaultValue = "0") int from,
                                                 @RequestParam(defaultValue = "10") int size) {
         return eventService.getByParamsForAdmin(users, states, categories, rangeStart, rangeEnd, from, size)

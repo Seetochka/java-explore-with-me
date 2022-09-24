@@ -7,9 +7,9 @@ import ru.practicum.statsservice.models.Statistic;
 import ru.practicum.statsservice.dto.ViewStats;
 import ru.practicum.statsservice.repositories.StatisticRepository;
 import ru.practicum.statsservice.services.StatisticService;
+import ru.practicum.statsservice.traits.DateTimeConverterTrait;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 
 /**
@@ -18,7 +18,7 @@ import java.util.Collection;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StatisticServiceImpl implements StatisticService {
+public class StatisticServiceImpl implements StatisticService, DateTimeConverterTrait {
     private static final String APP = "ewm-service";
 
     private final StatisticRepository statisticRepository;
@@ -33,8 +33,8 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public Collection<ViewStats> getByParams(String start, String end,
                                              Collection<String> uris, boolean unique) {
-        LocalDateTime startDate = LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        LocalDateTime endDate = LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime startDate = convertStringToLocalDateTime(start, null);
+        LocalDateTime endDate = convertStringToLocalDateTime(end, null);
 
         Collection<ViewStats> viewStats;
 

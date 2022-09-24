@@ -24,6 +24,7 @@ import ru.practicum.ewmservice.services.CategoryService;
 import ru.practicum.ewmservice.services.ParticipationRequestService;
 import ru.practicum.ewmservice.services.UserService;
 import ru.practicum.ewmservice.services.EventService;
+import ru.practicum.ewmservice.traits.DateTimeConverterTrait;
 import ru.practicum.ewmservice.traits.PageTrait;
 
 import javax.persistence.criteria.Join;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EventServiceImpl implements EventService, PageTrait {
+public class EventServiceImpl implements EventService, PageTrait, DateTimeConverterTrait {
     private final UserService userService;
     private final CategoryService categoryService;
     private final ParticipationRequestService participationRequestService;
@@ -261,8 +262,11 @@ public class EventServiceImpl implements EventService, PageTrait {
 
     @Override
     public Collection<Event> getByParamsForAdmin(Collection<Long> users, Collection<EventState> states,
-                                                 Collection<Long> categories, LocalDateTime rangeStart,
-                                                 LocalDateTime rangeEnd, int from, int size) {
+                                                 Collection<Long> categories, String rangeStart,
+                                                 String rangeEnd, int from, int size) {
+        LocalDateTime start = convertStringToLocalDateTime(rangeStart, null);
+        LocalDateTime end = convertStringToLocalDateTime(rangeEnd, null);
+
         Pageable page = getPage(from, size, "id", Sort.Direction.ASC);
         Specification<Event> specification = null;
 
@@ -286,17 +290,17 @@ public class EventServiceImpl implements EventService, PageTrait {
             );
         }
 
-        if (rangeStart != null) {
+        if (start != null) {
             specification = Specification.where(specification).and(
                     (root, criteriaQuery, criteriaBuilder) ->
-                            criteriaBuilder.greaterThan(root.get("eventDate").as(LocalDateTime.class), rangeStart)
+                            criteriaBuilder.greaterThan(root.get("eventDate").as(LocalDateTime.class), start)
             );
         }
 
-        if (rangeEnd != null) {
+        if (end != null) {
             specification = Specification.where(specification).and(
                     (root, criteriaQuery, criteriaBuilder) ->
-                            criteriaBuilder.lessThan(root.get("eventDate").as(LocalDateTime.class), rangeEnd)
+                            criteriaBuilder.lessThan(root.get("eventDate").as(LocalDateTime.class), end)
             );
         }
 
@@ -308,8 +312,11 @@ public class EventServiceImpl implements EventService, PageTrait {
 
     @Override
     public Collection<Event> getByParamsForUser(String text, Collection<Long> categories, Boolean paid,
-                                                LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable,
+                                                String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                                 EventSort sort, int from, int size) {
+        LocalDateTime start = convertStringToLocalDateTime(rangeStart, null);
+        LocalDateTime end = convertStringToLocalDateTime(rangeEnd, null);
+
         Specification<Event> specification = Specification.where(
                 (root, criteriaQuery, criteriaBuilder) ->
                         criteriaBuilder.equal(root.get("state"), EventState.PUBLISHED)
@@ -345,21 +352,21 @@ public class EventServiceImpl implements EventService, PageTrait {
             );
         }
 
-        if (rangeStart != null) {
+        if (start != null) {
             specification = Specification.where(specification).and(
                     (root, criteriaQuery, criteriaBuilder) ->
-                            criteriaBuilder.greaterThan(root.get("eventDate").as(LocalDateTime.class), rangeStart)
+                            criteriaBuilder.greaterThan(root.get("eventDate").as(LocalDateTime.class), start)
             );
         }
 
-        if (rangeEnd != null) {
+        if (end != null) {
             specification = Specification.where(specification).and(
                     (root, criteriaQuery, criteriaBuilder) ->
-                            criteriaBuilder.lessThan(root.get("eventDate").as(LocalDateTime.class), rangeEnd)
+                            criteriaBuilder.lessThan(root.get("eventDate").as(LocalDateTime.class), end)
             );
         }
 
-        if (rangeStart == null && rangeEnd == null) {
+        if (start == null && end == null) {
             specification = Specification.where(specification).and(
                     (root, criteriaQuery, criteriaBuilder) ->
                             criteriaBuilder.greaterThan(root.get("eventDate").as(LocalDateTime.class),
