@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import ru.practicum.ewmservice.clients.EventClient;
 import ru.practicum.ewmservice.dto.ViewStats;
@@ -53,8 +54,9 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     private final EventClient eventClient;
 
     @Override
+    @Transactional
     public Event create(long userId, Event event) throws ObjectNotFountException {
-        if (categoryService.checkExistsById(event.getCategory().getId())) {
+        if (!categoryService.checkExistsById(event.getCategory().getId())) {
             throw new ObjectNotFountException(
                     String.format("Категория с id %d не существует", event.getCategory().getId()),
                     "CreateEvent"
@@ -76,8 +78,9 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
+    @Transactional
     public Event updateAdmin(long eventId, Event event) throws ObjectNotFountException {
-        if (categoryService.checkExistsById(event.getCategory().getId())) {
+        if (!categoryService.checkExistsById(event.getCategory().getId())) {
             throw new ObjectNotFountException(
                     String.format("Категория с id %d не существует", event.getCategory().getId()),
                     "UpdateEventAdmin"
@@ -105,15 +108,16 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
+    @Transactional
     public Event updateUser(long userId, Event event) throws ObjectNotFountException, UserHaveNoRightsException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "UpdateEventUser"
             );
         }
 
-        if (categoryService.checkExistsById(event.getCategory().getId())) {
+        if (!categoryService.checkExistsById(event.getCategory().getId())) {
             throw new ObjectNotFountException(
                     String.format("Категория с id %d не существует", event.getCategory().getId()),
                     "UpdateEventUser"
@@ -146,6 +150,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
+    @Transactional
     public Event publish(long eventId) throws ObjectNotFountException {
         Event event = getById(eventId);
 
@@ -159,6 +164,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
+    @Transactional
     public Event reject(long eventId) throws ObjectNotFountException {
         Event event = getById(eventId);
 
@@ -171,9 +177,10 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
+    @Transactional
     public Event cancelEvent(long userId, long eventId) throws ObjectNotFountException, UserHaveNoRightsException,
             EventStateException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "CancelEvent"
@@ -207,16 +214,17 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
+    @Transactional
     public ParticipationRequest confirmParticipationRequest(long userId, long eventId, long reqId)
             throws ObjectNotFountException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "ConfirmParticipationRequest"
             );
         }
 
-        if (checkExistsById(eventId)) {
+        if (!checkExistsById(eventId)) {
             throw new ObjectNotFountException(
                     String.format("Событие с id %d не существует", eventId),
                     "ConfirmParticipationRequest"
@@ -234,16 +242,17 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
+    @Transactional
     public ParticipationRequest rejectParticipationRequest(long userId, long eventId, long reqId)
             throws ObjectNotFountException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "RejectParticipationRequest"
             );
         }
 
-        if (checkExistsById(eventId)) {
+        if (!checkExistsById(eventId)) {
             throw new ObjectNotFountException(
                     String.format("Событие с id %d не существует", eventId),
                     "RejectParticipationRequest"
@@ -436,7 +445,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
 
     @Override
     public Collection<Event> getByUserId(long userId, int from, int size) throws ObjectNotFountException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "GetByUserIdAndEventId"
@@ -454,7 +463,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     @Override
     public Event getByUserIdAndEventId(long userId, long eventId) throws ObjectNotFountException,
             UserHaveNoRightsException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "GetByUserIdAndEventId"
@@ -480,14 +489,14 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     @Override
     public Collection<ParticipationRequest> getRequestsByEventId(long userId, long eventId)
             throws ObjectNotFountException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "GetRequestsByEventId"
             );
         }
 
-        if (checkExistsById(eventId)) {
+        if (!checkExistsById(eventId)) {
             throw new ObjectNotFountException(
                     String.format("Событие с id %d не существует", eventId),
                     "GetRequestsByEventId"
@@ -499,7 +508,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
 
     @Override
     public boolean checkExistsById(long id) {
-        return !eventRepository.existsById(id);
+        return eventRepository.existsById(id);
     }
 
     private Event prepareEvent(Event event) {

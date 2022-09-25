@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.exceptions.ObjectNotFountException;
 import ru.practicum.ewmservice.models.User;
 import ru.practicum.ewmservice.repositories.UserRepository;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService, PageTrait {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public User create(User user) {
         user = userRepository.save(user);
 
@@ -31,8 +33,9 @@ public class UserServiceImpl implements UserService, PageTrait {
     }
 
     @Override
+    @Transactional
     public void delete(long id) throws ObjectNotFountException {
-        if (checkExistsById(id)) {
+        if (!checkExistsById(id)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", id),
                     "DeleteUser"
@@ -61,6 +64,6 @@ public class UserServiceImpl implements UserService, PageTrait {
 
     @Override
     public boolean checkExistsById(long id) {
-        return !userRepository.existsById(id);
+        return userRepository.existsById(id);
     }
 }

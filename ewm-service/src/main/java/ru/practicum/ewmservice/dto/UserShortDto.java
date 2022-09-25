@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO пользователя
+ * DTO с короткой информацией о пользователе
  */
 @Data
 @AllArgsConstructor

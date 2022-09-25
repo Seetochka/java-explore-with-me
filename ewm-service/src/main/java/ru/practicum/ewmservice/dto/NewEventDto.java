@@ -5,17 +5,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.practicum.ewmservice.traits.DateTimeConverterTrait;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 /**
- * DTO события
+ * DTO для добавления нового события
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewEventDto {
+public class NewEventDto implements DateTimeConverterTrait {
     @NotBlank
     @NonNull
     private String title;
@@ -28,7 +29,7 @@ public class NewEventDto {
     @NonNull
     private String description;
     @NonNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DEFAULT_PATTERN_DATE_TIME)
     private LocalDateTime eventDate;
     @NonNull
     private Location location;
@@ -36,6 +37,9 @@ public class NewEventDto {
     private int participantLimit;
     private boolean requestModeration;
 
+    /**
+     * Широта и долгота места проведения события
+     */
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

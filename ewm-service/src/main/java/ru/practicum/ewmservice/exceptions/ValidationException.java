@@ -3,8 +3,8 @@ package ru.practicum.ewmservice.exceptions;
 /**
  * Исключение валидации
  */
-public class ValidationException extends LoggingException {
-    public ValidationException(String message, String className) {
-        super(message, className);
+public class ValidationException extends BaseException {
+    public ValidationException(String message, String method) {
+        super(message, method);
     }
 }

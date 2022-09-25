@@ -1,18 +1,19 @@
 package ru.practicum.ewmservice.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 import ru.practicum.ewmservice.enums.ParticipationRequestStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Класс запроса на участие в событии
  */
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "participation_requests")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,4 +31,17 @@ public class ParticipationRequest {
     private ParticipationRequestStatus status;
     @Column(name = "created_at")
     private LocalDateTime created;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        ParticipationRequest that = (ParticipationRequest) o;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

@@ -3,6 +3,7 @@ package ru.practicum.statsservice.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.statsservice.models.Statistic;
 import ru.practicum.statsservice.dto.ViewStats;
 import ru.practicum.statsservice.repositories.StatisticRepository;
@@ -24,6 +25,7 @@ public class StatisticServiceImpl implements StatisticService, DateTimeConverter
     private final StatisticRepository statisticRepository;
 
     @Override
+    @Transactional
     public void createStat(Statistic statistic) {
         statistic = statisticRepository.save(statistic);
 

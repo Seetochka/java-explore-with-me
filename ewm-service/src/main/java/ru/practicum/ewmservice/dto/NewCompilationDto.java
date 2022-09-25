@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 
 /**
- * DTO подборки
+ * DTO для добавления новой подборки
  */
 @Data
 @AllArgsConstructor

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.exceptions.ObjectNotFountException;
 import ru.practicum.ewmservice.models.Compilation;
 import ru.practicum.ewmservice.models.Event;
@@ -28,6 +29,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
     private final EventService eventService;
 
     @Override
+    @Transactional
     public Compilation create(Compilation compilation) throws ObjectNotFountException {
         Collection<Event> events = new ArrayList<>();
 
@@ -44,8 +46,9 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
     }
 
     @Override
+    @Transactional
     public void delete(long id) throws ObjectNotFountException {
-        if (checkExistsById(id)) {
+        if (!checkExistsById(id)) {
             throw new ObjectNotFountException(
                     String.format("Подборки с id %d не существует", id),
                     "DeleteCompilation"
@@ -58,6 +61,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
     }
 
     @Override
+    @Transactional
     public void deleteEventFromCompilation(long compId, long eventId) throws ObjectNotFountException {
         Event event = eventService.getById(eventId);
         Compilation compilation = getById(compId);
@@ -69,6 +73,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
     }
 
     @Override
+    @Transactional
     public void addEventInCompilation(long compId, long eventId) throws ObjectNotFountException {
         Event event = eventService.getById(eventId);
         Compilation compilation = getById(compId);
@@ -80,6 +85,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
     }
 
     @Override
+    @Transactional
     public void unpinCompilation(long id) throws ObjectNotFountException {
         Compilation compilation = getById(id);
 
@@ -91,6 +97,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
     }
 
     @Override
+    @Transactional
     public void pinCompilation(long id) throws ObjectNotFountException {
         Compilation compilation = getById(id);
 
@@ -118,6 +125,6 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
 
     @Override
     public boolean checkExistsById(long id) {
-        return !compilationRepository.existsById(id);
+        return compilationRepository.existsById(id);
     }
 }

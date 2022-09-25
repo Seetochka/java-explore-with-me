@@ -3,6 +3,7 @@ package ru.practicum.ewmservice.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.enums.EventState;
 import ru.practicum.ewmservice.enums.ParticipationRequestStatus;
 import ru.practicum.ewmservice.exceptions.EventParticipantLimitException;
@@ -33,6 +34,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public ParticipationRequest create(long userId, long eventId)
             throws ObjectNotFountException, UserHaveNoRightsException, EventStateException, EventParticipantLimitException {
         User user = userService.getById(userId);
@@ -84,15 +86,16 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     }
 
     @Override
+    @Transactional
     public ParticipationRequest cancelParticipationRequest(long userId, long requestId) throws ObjectNotFountException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "CancelParticipationRequest"
             );
         }
 
-        if (checkExistsById(requestId)) {
+        if (!checkExistsById(requestId)) {
             throw new ObjectNotFountException(
                     String.format("Запрос на участие с id %d не существует", userId),
                     "CancelParticipationRequest"
@@ -119,7 +122,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public Collection<ParticipationRequest> getByUserId(long userId) throws ObjectNotFountException {
-        if (userService.checkExistsById(userId)) {
+        if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
                     "GetParticipationRequestByUserId"
@@ -136,6 +139,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public boolean checkExistsById(long id) {
-        return !participationRequestsRepository.existsById(id);
+        return participationRequestsRepository.existsById(id);
     }
 }

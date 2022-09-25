@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.exceptions.ObjectNotFountException;
 import ru.practicum.ewmservice.models.Category;
 import ru.practicum.ewmservice.repositories.CategoryRepository;
@@ -24,6 +25,7 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional
     public Category create(Category category) {
         category = categoryRepository.save(category);
 
@@ -32,8 +34,9 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
     }
 
     @Override
+    @Transactional
     public Category update(Category category) throws ObjectNotFountException {
-        if (checkExistsById(category.getId())) {
+        if (!checkExistsById(category.getId())) {
             throw new ObjectNotFountException(
                     String.format("Категория с id %d не существует", category.getId()),
                     "UpdateCategory"
@@ -44,8 +47,9 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
     }
 
     @Override
+    @Transactional
     public void delete(long id) throws ObjectNotFountException {
-        if (checkExistsById(id)) {
+        if (!checkExistsById(id)) {
             throw new ObjectNotFountException(
                     String.format("Категория с id %d не существует", id),
                     "DeleteCategory"
@@ -76,6 +80,6 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
 
     @Override
     public boolean checkExistsById(long id) {
-        return !categoryRepository.existsById(id);
+        return categoryRepository.existsById(id);
     }
 }
