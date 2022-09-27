@@ -1,11 +1,9 @@
 package ru.practicum.ewmservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import ru.practicum.ewmservice.traits.DateTimeConverterTrait;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -16,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventShortDto implements DateTimeConverterTrait {
+public class EventShortDto {
     private Long id;
     @NotBlank
     @NonNull
@@ -28,7 +26,6 @@ public class EventShortDto implements DateTimeConverterTrait {
     private Category category;
     private Integer confirmedRequests;
     @NonNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DEFAULT_PATTERN_DATE_TIME)
     private LocalDateTime eventDate;
     @NonNull
     private User initiator;

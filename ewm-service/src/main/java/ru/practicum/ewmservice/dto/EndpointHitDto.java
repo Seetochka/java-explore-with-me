@@ -1,10 +1,8 @@
 package ru.practicum.ewmservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.ewmservice.traits.DateTimeConverterTrait;
 
 import java.time.LocalDateTime;
 
@@ -14,11 +12,10 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EndpointHitDto implements DateTimeConverterTrait {
+public class EndpointHitDto {
     private Long id;
     private String app;
     private String uri;
     private String ip;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DEFAULT_PATTERN_DATE_TIME)
     private LocalDateTime timestamp;
 }
