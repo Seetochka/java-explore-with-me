@@ -20,7 +20,7 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class StatisticServiceImpl implements StatisticService, DateTimeConverterTrait {
-    private static final String APP = "ewm-service";
+    private static final String APP = "ewm-main-service";
 
     private final StatisticRepository statisticRepository;
 

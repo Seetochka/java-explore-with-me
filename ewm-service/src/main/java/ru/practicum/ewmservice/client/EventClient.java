@@ -16,6 +16,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class EventClient extends BaseClient implements DateTimeConverterTrait {
+    private static final String APP = "ewm-main-service";
+
     protected final ObjectMapper mapper;
 
     public EventClient(RestTemplate rest, ObjectMapper mapper) {
@@ -27,7 +29,7 @@ public class EventClient extends BaseClient implements DateTimeConverterTrait {
     public void createStat(HttpServletRequest httpRequest) {
         EndpointHitDto hitDto = new EndpointHitDto(
                 null,
-                "ewm-service",
+                APP,
                 httpRequest.getRequestURI(),
                 httpRequest.getRemoteAddr(),
                 LocalDateTime.now()
