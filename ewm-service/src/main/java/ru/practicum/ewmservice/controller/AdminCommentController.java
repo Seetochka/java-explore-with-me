@@ -24,14 +24,12 @@ public class AdminCommentController {
     @PatchMapping("/{commentId}/publish")
     public CommentDto publish(@PathVariable long commentId) throws ObjectNotFountException {
         Comment comment = commentService.publish(commentId);
-
         return commentMapper.toCommentDto(comment);
     }
 
     @PatchMapping("/{commentId}/reject")
     public CommentDto reject(@PathVariable long commentId) throws ObjectNotFountException {
         Comment comment = commentService.reject(commentId);
-
         return commentMapper.toCommentDto(comment);
     }
 }

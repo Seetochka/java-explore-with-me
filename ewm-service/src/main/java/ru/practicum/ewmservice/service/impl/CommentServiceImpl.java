@@ -11,8 +11,8 @@ import ru.practicum.ewmservice.model.Comment;
 import ru.practicum.ewmservice.model.Event;
 import ru.practicum.ewmservice.model.User;
 import ru.practicum.ewmservice.repository.CommentRepository;
-import ru.practicum.ewmservice.repository.EventRepository;
 import ru.practicum.ewmservice.service.CommentService;
+import ru.practicum.ewmservice.service.EventService;
 import ru.practicum.ewmservice.service.UserService;
 
 import java.time.LocalDateTime;
@@ -27,25 +27,22 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
 
     private final UserService userService;
-    private final EventRepository eventRepository;
+    private final EventService eventService;
 
 
     @Override
     @Transactional
     public Comment create(long userId, long eventId, Comment comment) throws ObjectNotFountException {
         User user = userService.getById(userId);
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new ObjectNotFountException(
+        Event event = eventService.getById(eventId).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", eventId),
                 "GetEventById"
         ));
-
         comment.setUser(user);
         comment.setStatus(CommentStatus.PENDING);
         comment.setEvent(event);
         comment.setCreated(LocalDateTime.now());
-
         comment = commentRepository.save(comment);
-
         log.info("CreateComment. Создан комментарий с id {}", comment.getId());
         return comment;
     }
@@ -61,7 +58,6 @@ public class CommentServiceImpl implements CommentService {
         }
 
         Comment comment = getById(commentId);
-
         if (userId != comment.getUser().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не имеет прав удалять комментарий с id %d", userId,
@@ -71,7 +67,6 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentRepository.deleteById(comment.getId());
-
         log.info("DeleteComment. Удален комментарий с id {}", comment.getId());
     }
 
@@ -79,11 +74,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public Comment publish(long commentId) throws ObjectNotFountException {
         Comment comment = getById(commentId);
-
         comment.setStatus(CommentStatus.PUBLISHED);
-
         comment = commentRepository.save(comment);
-
         log.info("PublishComment. Опубликован комментарий с id {}", comment.getId());
         return comment;
     }
@@ -92,11 +84,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public Comment reject(long commentId) throws ObjectNotFountException {
         Comment comment = getById(commentId);
-
         comment.setStatus(CommentStatus.CANCELED);
-
         comment = commentRepository.save(comment);
-
         log.info("RejectComment. Отменен комментарий с id {}", comment.getId());
         return comment;
     }

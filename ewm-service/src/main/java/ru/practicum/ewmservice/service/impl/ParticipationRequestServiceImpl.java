@@ -38,12 +38,10 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     public ParticipationRequest create(long userId, long eventId)
             throws ObjectNotFountException, UserHaveNoRightsException, EventStateException, EventParticipantLimitException {
         User user = userService.getById(userId);
-
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", eventId),
                 "CreateParticipationRequest"
         ));
-
         if (userId == event.getInitiator().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не может добавить запрос на участие в своем событии", userId),
@@ -68,7 +66,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         }
 
         ParticipationRequest participationRequest = new ParticipationRequest();
-
         if (event.getRequestModeration()) {
             participationRequest.setStatus(ParticipationRequestStatus.PENDING);
         } else {
@@ -78,9 +75,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         participationRequest.setRequester(user);
         participationRequest.setEvent(event);
         participationRequest.setCreated(LocalDateTime.now());
-
         participationRequest = participationRequestsRepository.save(participationRequest);
-
         log.info("CreateParticipationRequest. Создан запрос на участие с id {}", participationRequest.getId());
         return participationRequest;
     }
@@ -103,11 +98,8 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         }
 
         ParticipationRequest participationRequest = getById(requestId);
-
         participationRequest.setStatus(ParticipationRequestStatus.CANCELED);
-
         participationRequest = participationRequestsRepository.save(participationRequest);
-
         log.info("CancelParticipationRequest. Отменен запрос на участие с id {}", participationRequest.getId());
         return participationRequest;
     }

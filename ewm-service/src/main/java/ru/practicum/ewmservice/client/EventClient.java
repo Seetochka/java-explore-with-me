@@ -41,10 +41,8 @@ public class EventClient extends BaseClient implements DateTimeConverterTrait {
     public Collection<ViewStats> getStats(Collection<String> uris) {
         String start = LocalDateTime.now().minusDays(10L).format(DateTimeFormatter.ofPattern(dateTimeFormat));
         String end = LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
-
         ResponseEntity<Object[]> response = get("stats?start=" + start + "&end=" + end + "&uris="
                 + String.join("&uris=", uris));
-
         return Arrays.stream(Objects.requireNonNull(response.getBody()))
                 .map(object -> mapper.convertValue(object, ViewStats.class))
                 .collect(Collectors.toList());

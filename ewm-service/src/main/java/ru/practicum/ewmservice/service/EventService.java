@@ -9,6 +9,7 @@ import ru.practicum.ewmservice.model.Event;
 import ru.practicum.ewmservice.model.ParticipationRequest;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface EventService {
 
@@ -35,7 +36,9 @@ public interface EventService {
                                          String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                          EventSort sort, int from, int size);
 
-    Event getById(long id) throws ObjectNotFountException;
+    Event getByIdOrThrow(long id) throws ObjectNotFountException;
+
+    Optional<Event> getById(long id);
 
     Collection<Event> getByUserId(long userId, int from, int size) throws ObjectNotFountException;
 

@@ -19,14 +19,11 @@ public class CommentMapper {
     }
 
     public Comment toComment(CommentDto commentDto) {
-        return new Comment(
-                commentDto.getId(),
-                commentDto.getContent(),
-                commentDto.getStatus(),
-                null,
-                null,
-                null
-        );
+        Comment comment = new Comment();
+        comment.setId(commentDto.getId());
+        comment.setContent(commentDto.getContent());
+        comment.setStatus(commentDto.getStatus());
+        return comment;
     }
 
     private CommentDto.Event toCommentDtoEvent(Event event) {

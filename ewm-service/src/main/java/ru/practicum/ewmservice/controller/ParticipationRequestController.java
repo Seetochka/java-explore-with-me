@@ -1,7 +1,13 @@
 package ru.practicum.ewmservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.dto.ParticipationRequestDto;
 import ru.practicum.ewmservice.exception.EventParticipantLimitException;
 import ru.practicum.ewmservice.exception.EventStateException;
@@ -37,7 +43,6 @@ public class ParticipationRequestController {
                                           @RequestParam long eventId)
             throws ObjectNotFountException, EventStateException, UserHaveNoRightsException, EventParticipantLimitException {
         ParticipationRequest participationRequest = participationRequestService.create(userId, eventId);
-
         return participationRequestMapper.toParticipationRequestDto(participationRequest);
     }
 
@@ -46,7 +51,6 @@ public class ParticipationRequestController {
             throws ObjectNotFountException {
         ParticipationRequest participationRequest = participationRequestService.cancelParticipationRequest(userId,
                 requestId);
-
         return participationRequestMapper.toParticipationRequestDto(participationRequest);
     }
 }

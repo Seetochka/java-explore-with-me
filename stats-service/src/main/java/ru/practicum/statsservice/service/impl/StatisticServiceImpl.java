@@ -28,7 +28,6 @@ public class StatisticServiceImpl implements StatisticService, DateTimeConverter
     @Transactional
     public void createStat(Statistic statistic) {
         statistic = statisticRepository.save(statistic);
-
         log.info("CreateStat. Создана запись статистики с id {}", statistic.getId());
     }
 
@@ -37,9 +36,7 @@ public class StatisticServiceImpl implements StatisticService, DateTimeConverter
                                              Collection<String> uris, boolean unique) {
         LocalDateTime startDate = convertStringToLocalDateTime(start, null);
         LocalDateTime endDate = convertStringToLocalDateTime(end, null);
-
         Collection<ViewStats> viewStats;
-
         if (uris != null && !uris.isEmpty()) {
             if (unique) {
                 viewStats = statisticRepository.getDistinctStatisticByDatesAndUris(startDate, endDate, APP, uris);

@@ -1,9 +1,20 @@
 package ru.practicum.ewmservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.client.EventClient;
-import ru.practicum.ewmservice.dto.*;
+import ru.practicum.ewmservice.dto.EventFullDto;
+import ru.practicum.ewmservice.dto.EventShortDto;
+import ru.practicum.ewmservice.dto.NewEventDto;
+import ru.practicum.ewmservice.dto.ParticipationRequestDto;
+import ru.practicum.ewmservice.dto.UpdateEventRequestDto;
 import ru.practicum.ewmservice.enums.EventSort;
 import ru.practicum.ewmservice.exception.EventStateException;
 import ru.practicum.ewmservice.exception.ObjectNotFountException;
@@ -45,9 +56,7 @@ public class EventController {
 
         Collection<Event> events = eventService.getByParamsForUser(text, categories, paid, rangeStart, rangeEnd,
                 onlyAvailable, sort, from, size);
-
         eventClient.createStat(httpRequest);
-
         return events.stream()
                 .map(eventMapper::toEventShortDto)
                 .collect(Collectors.toList());
@@ -55,10 +64,8 @@ public class EventController {
 
     @GetMapping("/events/{id}")
     public EventFullDto getById(@PathVariable long id, HttpServletRequest httpRequest) throws ObjectNotFountException {
-        Event event = eventService.getById(id);
-
+        Event event = eventService.getByIdOrThrow(id);
         eventClient.createStat(httpRequest);
-
         return eventMapper.toEventFullDto(event);
     }
 
@@ -77,7 +84,6 @@ public class EventController {
     public EventFullDto update(@PathVariable long userId, @Valid @RequestBody UpdateEventRequestDto eventRequest)
             throws ObjectNotFountException, UserHaveNoRightsException {
         Event event = eventService.updateUser(userId, eventMapper.toEventForUpdate(eventRequest));
-
         return eventMapper.toEventFullDto(event);
     }
 
@@ -85,7 +91,6 @@ public class EventController {
     public EventFullDto create(@PathVariable long userId, @Valid @RequestBody NewEventDto eventDto)
             throws ObjectNotFountException {
         Event event = eventService.create(userId, eventMapper.toEventForCreate(eventDto));
-
         return eventMapper.toEventFullDto(event);
     }
 
@@ -99,7 +104,6 @@ public class EventController {
     public EventFullDto cancel(@PathVariable long userId, @PathVariable long eventId)
             throws ObjectNotFountException, EventStateException, UserHaveNoRightsException {
         Event event = eventService.cancelEvent(userId, eventId);
-
         return eventMapper.toEventFullDto(event);
     }
 

@@ -27,7 +27,6 @@ public class UserServiceImpl implements UserService, PageTrait {
     @Transactional
     public User create(User user) {
         user = userRepository.save(user);
-
         log.info("CreateUser. Создан пользователь с id {}", user.getId());
         return user;
     }
@@ -43,7 +42,6 @@ public class UserServiceImpl implements UserService, PageTrait {
         }
 
         userRepository.deleteById(id);
-
         log.info("DeleteUser. Удален пользователь с id {}", id);
     }
 
@@ -58,7 +56,6 @@ public class UserServiceImpl implements UserService, PageTrait {
     @Override
     public Collection<User> getByIds(Collection<Long> ids, int from, int size) {
         Pageable page = getPage(from, size, "id", Sort.Direction.ASC);
-
         return userRepository.findAllByIdIn(ids, page);
     }
 

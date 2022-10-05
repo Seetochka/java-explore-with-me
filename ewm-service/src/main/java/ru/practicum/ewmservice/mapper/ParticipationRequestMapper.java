@@ -6,8 +6,6 @@ import ru.practicum.ewmservice.model.Event;
 import ru.practicum.ewmservice.model.ParticipationRequest;
 import ru.practicum.ewmservice.model.User;
 
-import java.util.ArrayList;
-
 @Component
 public class ParticipationRequestMapper {
     public ParticipationRequestDto toParticipationRequestDto(ParticipationRequest participationRequests) {
@@ -21,11 +19,14 @@ public class ParticipationRequestMapper {
     }
 
     public ParticipationRequest toParticipationRequest(ParticipationRequestDto participationRequestDto) {
+        Event event = new Event();
+        event.setId(participationRequestDto.getEvent());
+        User user = new User();
+        user.setId(participationRequestDto.getRequester());
         return new ParticipationRequest(
                 participationRequestDto.getId(),
-                new Event(participationRequestDto.getEvent(), null, null, null, null, null, null, null, null, null,
-                        null, null, null, null, null, null, null, 0, new ArrayList<>()),
-                new User(participationRequestDto.getRequester(), null, null),
+                event,
+                user,
                 participationRequestDto.getStatus(),
                 participationRequestDto.getCreated()
         );

@@ -37,6 +37,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -67,15 +68,12 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         User user = userService.getById(userId);
-
         event.setInitiator(user);
         event.setState(EventState.PENDING);
         event.setPublishedOn(null);
         event.setCreatedAt(LocalDateTime.now());
         event.setUpdatedAt(LocalDateTime.now());
-
         event = eventRepository.save(event);
-
         log.info("CreateEvent. Создано событие с id {}", event.getId());
         return event;
     }
@@ -90,8 +88,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
             );
         }
 
-        Event eventUpdated = getById(event.getId());
-
+        Event eventUpdated = getByIdOrThrow(event.getId());
         eventUpdated.setTitle(event.getTitle());
         eventUpdated.setAnnotation(event.getAnnotation());
         eventUpdated.setCategory(event.getCategory());
@@ -103,9 +100,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         eventUpdated.setParticipantLimit(event.getParticipantLimit());
         eventUpdated.setRequestModeration(event.getRequestModeration());
         eventUpdated.setUpdatedAt(LocalDateTime.now());
-
         eventUpdated = eventRepository.save(eventUpdated);
-
         log.info("UpdateEventAdmin. Обновлено событие с id {}", event.getId());
         return eventUpdated;
     }
@@ -127,8 +122,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
             );
         }
 
-        Event eventUpdated = getById(event.getId());
-
+        Event eventUpdated = getByIdOrThrow(event.getId());
         if (userId != eventUpdated.getInitiator().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не имеет прав редактировать событие с id %d", userId,
@@ -145,9 +139,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         eventUpdated.setPaid(event.getPaid());
         eventUpdated.setParticipantLimit(event.getParticipantLimit());
         eventUpdated.setUpdatedAt(LocalDateTime.now());
-
         eventUpdated = eventRepository.save(eventUpdated);
-
         log.info("UpdateEventUser. Обновлено событие с id {}", event.getId());
         return eventUpdated;
     }
@@ -155,13 +147,10 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     @Override
     @Transactional
     public Event publish(long eventId) throws ObjectNotFountException {
-        Event event = getById(eventId);
-
+        Event event = getByIdOrThrow(eventId);
         event.setState(EventState.PUBLISHED);
         event.setPublishedOn(LocalDateTime.now());
-
         event = eventRepository.save(event);
-
         log.info("PublishEvent. Опубликовано событие с id {}", event.getId());
         return event;
     }
@@ -169,12 +158,9 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     @Override
     @Transactional
     public Event reject(long eventId) throws ObjectNotFountException {
-        Event event = getById(eventId);
-
+        Event event = getByIdOrThrow(eventId);
         event.setState(EventState.CANCELED);
-
         event = eventRepository.save(event);
-
         log.info("RejectEvent. Отклонено событие с id {}", event.getId());
         return event;
     }
@@ -190,8 +176,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
             );
         }
 
-        Event event = getById(eventId);
-
+        Event event = getByIdOrThrow(eventId);
         if (userId != event.getInitiator().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не имеет прав редактировать событие с id %d", userId,
@@ -209,9 +194,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         event.setState(EventState.CANCELED);
-
         event = eventRepository.save(event);
-
         log.info("CancelEvent. Отменено событие с id {}", event.getId());
         return event;
     }
@@ -235,11 +218,8 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         ParticipationRequest participationRequest = participationRequestService.getById(reqId);
-
         participationRequest.setStatus(ParticipationRequestStatus.CONFIRMED);
-
         participationRequest = participationRequestsRepository.save(participationRequest);
-
         log.info("ConfirmParticipationRequest. Подтверждение заявки на участии с id {}", reqId);
         return participationRequest;
     }
@@ -263,11 +243,8 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         ParticipationRequest participationRequest = participationRequestService.getById(reqId);
-
         participationRequest.setStatus(ParticipationRequestStatus.REJECTED);
-
         participationRequest = participationRequestsRepository.save(participationRequest);
-
         log.info("RejectParticipationRequest. Отклонение заявки на участии с id {}", reqId);
         return participationRequest;
     }
@@ -278,10 +255,8 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                                                  String rangeEnd, int from, int size) {
         LocalDateTime start = convertStringToLocalDateTime(rangeStart, null);
         LocalDateTime end = convertStringToLocalDateTime(rangeEnd, null);
-
         Pageable page = getPage(from, size, "id", Sort.Direction.ASC);
         Specification<Event> specification = null;
-
         if (users != null && !users.isEmpty()) {
             specification = Specification.where(specification).and(
                     (root, criteriaQuery, criteriaBuilder) ->
@@ -328,12 +303,10 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                                                 EventSort sort, int from, int size) {
         LocalDateTime start = convertStringToLocalDateTime(rangeStart, null);
         LocalDateTime end = convertStringToLocalDateTime(rangeEnd, null);
-
         Specification<Event> specification = Specification.where(
                 (root, criteriaQuery, criteriaBuilder) ->
                         criteriaBuilder.equal(root.get("state"), EventState.PUBLISHED)
         );
-
         if (StringUtils.hasText(text)) {
             Specification<Event> specificationSearch = Specification.where(
                     (root, criteriaQuery, criteriaBuilder) ->
@@ -391,7 +364,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                     (root, criteriaQuery, criteriaBuilder) ->
                             criteriaBuilder.equal(root.get("participantLimit"), 0)
             );
-
             specificationAvailable = Specification.where(specificationAvailable)
                     .or(
                             (root, criteriaQuery, criteriaBuilder) -> {
@@ -404,7 +376,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                                 return criteriaBuilder.lessThan(sub, root.get("participantLimit"));
                             }
                     );
-
             specification = Specification.where(specification)
                     .and(specificationAvailable);
         }
@@ -413,7 +384,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                 .stream()
                 .map(this::prepareEvent)
                 .collect(Collectors.toList());
-
         if (sort.equals(EventSort.EVENT_DATE)) {
             return result.stream()
                     .sorted(Comparator.comparing(Event::getViews))
@@ -437,13 +407,17 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
-    public Event getById(long id) throws ObjectNotFountException {
+    public Event getByIdOrThrow(long id) throws ObjectNotFountException {
         Event event = eventRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", id),
                 "GetEventById"
         ));
-
         return prepareEvent(event);
+    }
+
+    @Override
+    public Optional<Event> getById(long id) {
+        return eventRepository.findById(id);
     }
 
     @Override
@@ -456,7 +430,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         Pageable page = getPage(from, size, "id", Sort.Direction.ASC);
-
         return eventRepository.findAllByInitiatorId(userId, page)
                 .stream()
                 .map(this::prepareEvent)
@@ -477,7 +450,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                 String.format("Событие с id %d не существует", eventId),
                 "GetByUserIdAndEventId"
         ));
-
         if (userId != event.getInitiator().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не имеет прав редактировать событие с id %d", userId,
@@ -516,7 +488,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
 
     private Event prepareEvent(Event event) {
         Collection<ViewStats> viewStats = eventClient.getStats(List.of("/events/" + event.getId()));
-
         if (!viewStats.isEmpty()) {
             event.setViews(
                     viewStats.stream()

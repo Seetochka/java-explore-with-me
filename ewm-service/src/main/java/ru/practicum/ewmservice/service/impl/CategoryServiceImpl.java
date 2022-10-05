@@ -28,7 +28,6 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
     @Transactional
     public Category create(Category category) {
         category = categoryRepository.save(category);
-
         log.info("CreateCategory. Создана категория с id {}", category.getId());
         return category;
     }
@@ -57,7 +56,6 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
         }
 
         categoryRepository.deleteById(id);
-
         log.info("DeleteCategory. Удалена категория с id {}", id);
     }
 
@@ -72,7 +70,6 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
     @Override
     public Collection<Category> getAll(int from, int size) {
         Pageable page = getPage(from, size, "id", Sort.Direction.ASC);
-
         return categoryRepository.findAll(page)
                 .stream()
                 .collect(Collectors.toList());

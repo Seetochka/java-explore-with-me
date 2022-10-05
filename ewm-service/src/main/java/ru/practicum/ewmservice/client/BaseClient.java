@@ -30,13 +30,11 @@ public class BaseClient {
         var requestEntity = new HttpEntity<>(defaultHeaders());
 
         ResponseEntity<Object[]> statsServerResponse;
-
         try {
             statsServerResponse = rest.exchange(path, method, requestEntity, Object[].class);
         } catch (HttpStatusCodeException e) {
             return null;
         }
-
         return prepareStatResponse(statsServerResponse);
     }
 
@@ -44,13 +42,11 @@ public class BaseClient {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
 
         ResponseEntity<Object> statsServerResponse;
-
         try {
             statsServerResponse = rest.exchange(path, method, requestEntity, Object.class);
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
-
         return prepareStatResponse(statsServerResponse);
     }
 
@@ -67,11 +63,9 @@ public class BaseClient {
         }
 
         ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-
         if (response.hasBody()) {
             return responseBuilder.body(response.getBody());
         }
-
         return responseBuilder.build();
     }
 }

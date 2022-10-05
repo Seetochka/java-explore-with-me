@@ -1,7 +1,14 @@
 package ru.practicum.ewmservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.dto.CompilationDto;
 import ru.practicum.ewmservice.dto.NewCompilationDto;
 import ru.practicum.ewmservice.exception.ObjectNotFountException;
@@ -24,32 +31,36 @@ public class AdminCompilationController {
     @PostMapping
     public CompilationDto create(@Valid @RequestBody NewCompilationDto compilationDto) throws ObjectNotFountException {
         Compilation compilation = compilationService.create(compilationMapper.toCompilation(compilationDto));
-
         return compilationMapper.toCompilationDto(compilation);
     }
 
     @DeleteMapping("/{compId}")
-    public void delete(@PathVariable long compId) throws ObjectNotFountException {
+    public HttpStatus delete(@PathVariable long compId) throws ObjectNotFountException {
         compilationService.delete(compId);
+        return HttpStatus.OK;
     }
 
     @DeleteMapping("/{compId}/events/{eventId}")
-    public void deleteEventFromCompilation(@PathVariable long compId, @PathVariable long eventId) throws ObjectNotFountException {
+    public HttpStatus deleteEventFromCompilation(@PathVariable long compId, @PathVariable long eventId) throws ObjectNotFountException {
         compilationService.deleteEventFromCompilation(compId, eventId);
+        return HttpStatus.OK;
     }
 
     @PatchMapping("/{compId}/events/{eventId}")
-    public void addEventInCompilation(@PathVariable long compId, @PathVariable long eventId) throws ObjectNotFountException {
+    public HttpStatus addEventInCompilation(@PathVariable long compId, @PathVariable long eventId) throws ObjectNotFountException {
         compilationService.addEventInCompilation(compId, eventId);
+        return HttpStatus.OK;
     }
 
     @DeleteMapping("/{compId}/pin")
-    public void unpinCompilation(@PathVariable long compId) throws ObjectNotFountException {
+    public HttpStatus unpinCompilation(@PathVariable long compId) throws ObjectNotFountException {
         compilationService.unpinCompilation(compId);
+        return HttpStatus.OK;
     }
 
     @PatchMapping("/{compId}/pin")
-    public void pinCompilation(@PathVariable long compId) throws ObjectNotFountException {
+    public HttpStatus pinCompilation(@PathVariable long compId) throws ObjectNotFountException {
         compilationService.pinCompilation(compId);
+        return HttpStatus.OK;
     }
 }

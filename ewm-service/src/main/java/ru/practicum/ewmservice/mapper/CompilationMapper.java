@@ -6,7 +6,6 @@ import ru.practicum.ewmservice.dto.NewCompilationDto;
 import ru.practicum.ewmservice.model.Compilation;
 import ru.practicum.ewmservice.model.Event;
 
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,9 +29,9 @@ public class CompilationMapper {
     }
 
     private Event toEvent(Long eventId) {
-        return new Event(eventId, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, 0, new ArrayList<>()
-        );
+        Event event = new Event();
+        event.setId(eventId);
+        return event;
     }
 
     private CompilationDto.Event toCompilationDtoEvent(Event event) {
