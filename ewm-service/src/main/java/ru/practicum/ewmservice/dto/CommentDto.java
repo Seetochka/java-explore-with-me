@@ -4,22 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.practicum.ewmservice.enums.CommentStatus;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Collection;
+import java.time.LocalDateTime;
 
-/**
- * DTO подборки
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CompilationDto {
-    @NonNull
+public class CommentDto {
     private Long id;
     @NotBlank
     @NonNull
-    private String title;
-    private boolean pinned;
-    private Collection<EventShortDto> events;
+    private String content;
+    private CommentStatus status;
+    private UserShortDto user;
+    private EventShortDto event;
+    private LocalDateTime created;
 }

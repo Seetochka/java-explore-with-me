@@ -21,13 +21,10 @@ public class ObjectMapperConfiguration {
                 DateTimeFormatter.ofPattern(dateTimeFormat));
         LocalDateTimeSerializer localDateTimeSerializer = new LocalDateTimeSerializer(
                 DateTimeFormatter.ofPattern(dateTimeFormat));
-
         dateTimeModule.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
         dateTimeModule.addSerializer(LocalDateTime.class, localDateTimeSerializer);
-
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(dateTimeModule);
-
         return mapper;
     }
 }

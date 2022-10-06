@@ -27,14 +27,13 @@ public class UserServiceImpl implements UserService, PageTrait {
     @Transactional
     public User create(User user) {
         user = userRepository.save(user);
-
         log.info("CreateUser. Создан пользователь с id {}", user.getId());
         return user;
     }
 
     @Override
     @Transactional
-    public void delete(long id) throws ObjectNotFountException {
+    public void delete(long id) {
         if (!checkExistsById(id)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", id),
@@ -43,12 +42,11 @@ public class UserServiceImpl implements UserService, PageTrait {
         }
 
         userRepository.deleteById(id);
-
         log.info("DeleteUser. Удален пользователь с id {}", id);
     }
 
     @Override
-    public User getById(long id) throws ObjectNotFountException {
+    public User getById(long id) {
         return userRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Пользователь с id %d не существует", id),
                 "GetUserById"
@@ -58,7 +56,6 @@ public class UserServiceImpl implements UserService, PageTrait {
     @Override
     public Collection<User> getByIds(Collection<Long> ids, int from, int size) {
         Pageable page = getPage(from, size, "id", Sort.Direction.ASC);
-
         return userRepository.findAllByIdIn(ids, page);
     }
 

@@ -23,7 +23,6 @@ public class WebClientConfiguration {
                 .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();
-
         return new EventClient(rest, mapper);
     }
 }

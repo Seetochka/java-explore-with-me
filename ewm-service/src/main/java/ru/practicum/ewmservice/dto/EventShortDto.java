@@ -23,28 +23,12 @@ public class EventShortDto {
     @NonNull
     private String annotation;
     @NonNull
-    private Category category;
+    private CategoryDto category;
     private Integer confirmedRequests;
     @NonNull
     private LocalDateTime eventDate;
     @NonNull
-    private User initiator;
+    private UserShortDto initiator;
     private boolean paid;
     private Long views;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Category {
-        private Long id;
-        private String name;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class User {
-        private Long id;
-        private String name;
-    }
 }
