@@ -1,19 +1,23 @@
 package ru.practicum.ewmservice.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewmservice.dto.CommentDto;
 import ru.practicum.ewmservice.model.Comment;
-import ru.practicum.ewmservice.model.Event;
 
 @Component
+@RequiredArgsConstructor
 public class CommentMapper {
+    private final UserMapper userMapper;
+    private final EventMapper eventMapper;
+
     public CommentDto toCommentDto(Comment comment) {
         return new CommentDto(
                 comment.getId(),
                 comment.getContent(),
                 comment.getStatus(),
-                new CommentDto.User(comment.getUser().getId(), comment.getUser().getName()),
-                toCommentDtoEvent(comment.getEvent()),
+                userMapper.toUserShortDto(comment.getUser()),
+                eventMapper.toEventShortDto(comment.getEvent()),
                 comment.getCreated()
         );
     }
@@ -24,19 +28,5 @@ public class CommentMapper {
         comment.setContent(commentDto.getContent());
         comment.setStatus(commentDto.getStatus());
         return comment;
-    }
-
-    private CommentDto.Event toCommentDtoEvent(Event event) {
-        return new CommentDto.Event(
-                event.getId(),
-                event.getTitle(),
-                event.getAnnotation(),
-                new CommentDto.Event.Category(event.getCategory().getId(), event.getCategory().getName()),
-                event.getConfirmedRequests(),
-                event.getEventDate(),
-                new CommentDto.Event.User(event.getInitiator().getId(), event.getInitiator().getName()),
-                event.getPaid(),
-                0
-        );
     }
 }

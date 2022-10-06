@@ -32,7 +32,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment create(long userId, long eventId, Comment comment) throws ObjectNotFountException {
+    public Comment create(long userId, long eventId, Comment comment) {
         User user = userService.getById(userId);
         Event event = eventService.getById(eventId).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", eventId),
@@ -49,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void delete(long userId, long commentId) throws ObjectNotFountException, UserHaveNoRightsException {
+    public void delete(long userId, long commentId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -72,7 +72,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment publish(long commentId) throws ObjectNotFountException {
+    public Comment publish(long commentId) {
         Comment comment = getById(commentId);
         comment.setStatus(CommentStatus.PUBLISHED);
         comment = commentRepository.save(comment);
@@ -82,7 +82,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment reject(long commentId) throws ObjectNotFountException {
+    public Comment reject(long commentId) {
         Comment comment = getById(commentId);
         comment.setStatus(CommentStatus.CANCELED);
         comment = commentRepository.save(comment);
@@ -91,7 +91,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment getById(long id) throws ObjectNotFountException {
+    public Comment getById(long id) {
         return commentRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Комменарий с id %d не существует", id),
                 "GetCommentById"

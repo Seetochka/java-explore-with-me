@@ -35,8 +35,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     @Transactional
-    public ParticipationRequest create(long userId, long eventId)
-            throws ObjectNotFountException, UserHaveNoRightsException, EventStateException, EventParticipantLimitException {
+    public ParticipationRequest create(long userId, long eventId) {
         User user = userService.getById(userId);
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", eventId),
@@ -82,7 +81,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     @Transactional
-    public ParticipationRequest cancelParticipationRequest(long userId, long requestId) throws ObjectNotFountException {
+    public ParticipationRequest cancelParticipationRequest(long userId, long requestId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -105,7 +104,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     }
 
     @Override
-    public ParticipationRequest getById(long id) throws ObjectNotFountException {
+    public ParticipationRequest getById(long id) {
         return participationRequestsRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Запрос на участие с id %d не существует", id),
                 "GetParticipationRequestById"
@@ -113,7 +112,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     }
 
     @Override
-    public Collection<ParticipationRequest> getByUserId(long userId) throws ObjectNotFountException {
+    public Collection<ParticipationRequest> getByUserId(long userId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),

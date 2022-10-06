@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.dto.AdminUpdateEventRequestDto;
 import ru.practicum.ewmservice.dto.EventFullDto;
 import ru.practicum.ewmservice.enums.EventState;
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
 import ru.practicum.ewmservice.mapper.EventMapper;
 import ru.practicum.ewmservice.model.Event;
 import ru.practicum.ewmservice.service.EventService;
@@ -45,20 +44,19 @@ public class AdminEventController {
     }
 
     @PutMapping("/{eventId}")
-    public EventFullDto update(@PathVariable long eventId, @RequestBody AdminUpdateEventRequestDto eventRequest)
-            throws ObjectNotFountException {
+    public EventFullDto update(@PathVariable long eventId, @RequestBody AdminUpdateEventRequestDto eventRequest) {
         Event event = eventService.updateAdmin(eventId, eventMapper.toEventForAdminUpdate(eventRequest));
         return eventMapper.toEventFullDto(event);
     }
 
     @PatchMapping("/{eventId}/publish")
-    public EventFullDto publish(@PathVariable long eventId) throws ObjectNotFountException {
+    public EventFullDto publish(@PathVariable long eventId) {
         Event event = eventService.publish(eventId);
         return eventMapper.toEventFullDto(event);
     }
 
     @PatchMapping("/{eventId}/reject")
-    public EventFullDto reject(@PathVariable long eventId) throws ObjectNotFountException {
+    public EventFullDto reject(@PathVariable long eventId) {
         Event event = eventService.reject(eventId);
         return eventMapper.toEventFullDto(event);
     }

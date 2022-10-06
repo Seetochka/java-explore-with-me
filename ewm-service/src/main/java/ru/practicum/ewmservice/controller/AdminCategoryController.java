@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.dto.CategoryDto;
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
 import ru.practicum.ewmservice.mapper.CategoryMapper;
 import ru.practicum.ewmservice.model.Category;
 import ru.practicum.ewmservice.service.CategoryService;
@@ -34,13 +33,13 @@ public class AdminCategoryController {
     }
 
     @PatchMapping
-    public CategoryDto update(@Valid @RequestBody CategoryDto categoryDto) throws ObjectNotFountException {
+    public CategoryDto update(@Valid @RequestBody CategoryDto categoryDto) {
         Category category = categoryService.update(categoryMapper.toCategory(categoryDto));
         return categoryMapper.toCategoryDto(category);
     }
 
     @DeleteMapping("/{catId}")
-    public HttpStatus delete(@PathVariable long catId) throws ObjectNotFountException {
+    public HttpStatus delete(@PathVariable long catId) {
         categoryService.delete(catId);
         return HttpStatus.OK;
     }

@@ -1,6 +1,5 @@
 package ru.practicum.ewmservice.service;
 
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
 import ru.practicum.ewmservice.model.User;
 
 import java.util.Collection;
@@ -8,9 +7,9 @@ import java.util.Collection;
 public interface UserService {
     User create(User user);
 
-    void delete(long id) throws ObjectNotFountException;
+    void delete(long id);
 
-    User getById(long id) throws ObjectNotFountException;
+    User getById(long id);
 
     Collection<User> getByIds(Collection<Long> ids, int from, int size);
 

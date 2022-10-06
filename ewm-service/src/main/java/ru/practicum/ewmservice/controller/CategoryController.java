@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.service.CategoryService;
 import ru.practicum.ewmservice.dto.CategoryDto;
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
 import ru.practicum.ewmservice.mapper.CategoryMapper;
 
 import java.util.Collection;
@@ -25,7 +24,7 @@ public class CategoryController {
     private final CategoryMapper categoryMapper;
 
     @GetMapping("/categories/{catId}")
-    public CategoryDto getById(@PathVariable long catId) throws ObjectNotFountException {
+    public CategoryDto getById(@PathVariable long catId) {
         return categoryMapper.toCategoryDto((categoryService.getById(catId)));
     }
 

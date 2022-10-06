@@ -30,7 +30,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
 
     @Override
     @Transactional
-    public Compilation create(Compilation compilation) throws ObjectNotFountException {
+    public Compilation create(Compilation compilation) {
         Collection<Event> events = new ArrayList<>();
 
         for (Event event : compilation.getEvents()) {
@@ -45,7 +45,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
 
     @Override
     @Transactional
-    public void delete(long id) throws ObjectNotFountException {
+    public void delete(long id) {
         if (!checkExistsById(id)) {
             throw new ObjectNotFountException(
                     String.format("Подборки с id %d не существует", id),
@@ -59,7 +59,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
 
     @Override
     @Transactional
-    public void deleteEventFromCompilation(long compId, long eventId) throws ObjectNotFountException {
+    public void deleteEventFromCompilation(long compId, long eventId) {
         Event event = eventService.getById(eventId).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", eventId),
                 "DeleteEventFromCompilation"
@@ -72,7 +72,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
 
     @Override
     @Transactional
-    public void addEventInCompilation(long compId, long eventId) throws ObjectNotFountException {
+    public void addEventInCompilation(long compId, long eventId) {
         Event event = eventService.getById(eventId).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", eventId),
                 "AddEventFromCompilation"
@@ -85,7 +85,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
 
     @Override
     @Transactional
-    public void unpinCompilation(long id) throws ObjectNotFountException {
+    public void unpinCompilation(long id) {
         Compilation compilation = getById(id);
         compilation.setPinned(false);
         compilationRepository.save(compilation);
@@ -94,7 +94,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
 
     @Override
     @Transactional
-    public void pinCompilation(long id) throws ObjectNotFountException {
+    public void pinCompilation(long id) {
         Compilation compilation = getById(id);
         compilation.setPinned(true);
         compilationRepository.save(compilation);
@@ -108,7 +108,7 @@ public class CompilationServiceImpl implements CompilationService, PageTrait {
     }
 
     @Override
-    public Compilation getById(long id) throws ObjectNotFountException {
+    public Compilation getById(long id) {
         return compilationRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Подборки с id %d не существует", id),
                 "GetCompilationById"

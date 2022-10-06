@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService, PageTrait {
 
     @Override
     @Transactional
-    public void delete(long id) throws ObjectNotFountException {
+    public void delete(long id) {
         if (!checkExistsById(id)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", id),
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService, PageTrait {
     }
 
     @Override
-    public User getById(long id) throws ObjectNotFountException {
+    public User getById(long id) {
         return userRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Пользователь с id %d не существует", id),
                 "GetUserById"

@@ -1,11 +1,15 @@
 package ru.practicum.ewmservice.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewmservice.dto.AdminUpdateEventRequestDto;
+import ru.practicum.ewmservice.dto.CommentDto;
 import ru.practicum.ewmservice.dto.EventFullDto;
 import ru.practicum.ewmservice.dto.EventShortDto;
+import ru.practicum.ewmservice.dto.Location;
 import ru.practicum.ewmservice.dto.NewEventDto;
 import ru.practicum.ewmservice.dto.UpdateEventRequestDto;
+import ru.practicum.ewmservice.dto.UserShortDto;
 import ru.practicum.ewmservice.model.Category;
 import ru.practicum.ewmservice.model.Comment;
 import ru.practicum.ewmservice.model.Event;
@@ -14,19 +18,23 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class EventMapper {
+    private final UserMapper userMapper;
+    private final CategoryMapper categoryMapper;
+
     public EventFullDto toEventFullDto(Event event) {
         return new EventFullDto(
                 event.getId(),
                 event.getTitle(),
                 event.getAnnotation(),
-                new EventFullDto.Category(event.getCategory().getId(), event.getCategory().getName()),
+                categoryMapper.toCategoryDto(event.getCategory()),
                 event.getConfirmedRequests(),
                 event.getCreatedAt(),
                 event.getDescription(),
                 event.getEventDate(),
-                new EventFullDto.User(event.getInitiator().getId(), event.getInitiator().getName()),
-                new EventFullDto.Location(event.getLat(), event.getLon()),
+                userMapper.toUserShortDto(event.getInitiator()),
+                new Location(event.getLat(), event.getLon()),
                 event.getPaid(),
                 event.getParticipantLimit(),
                 event.getPublishedOn(),
@@ -42,10 +50,10 @@ public class EventMapper {
                 event.getId(),
                 event.getTitle(),
                 event.getAnnotation(),
-                new EventShortDto.Category(event.getCategory().getId(), event.getCategory().getName()),
+                categoryMapper.toCategoryDto(event.getCategory()),
                 event.getConfirmedRequests(),
                 event.getEventDate(),
-                new EventShortDto.User(event.getInitiator().getId(), event.getInitiator().getName()),
+                userMapper.toUserShortDto(event.getInitiator()),
                 event.getPaid(),
                 event.getViews()
         );
@@ -59,8 +67,8 @@ public class EventMapper {
         event.setCategory(new Category(eventRequest.getCategory(), null));
         event.setDescription(eventRequest.getDescription());
         event.setEventDate(eventRequest.getEventDate());
-        event.setLat(Optional.ofNullable(eventRequest.getLocation()).map(AdminUpdateEventRequestDto.Location::getLat).orElse(null));
-        event.setLon(Optional.ofNullable(eventRequest.getLocation()).map(AdminUpdateEventRequestDto.Location::getLon).orElse(null));
+        event.setLat(Optional.ofNullable(eventRequest.getLocation()).map(Location::getLat).orElse(null));
+        event.setLon(Optional.ofNullable(eventRequest.getLocation()).map(Location::getLon).orElse(null));
         event.setPaid(eventRequest.isPaid());
         event.setParticipantLimit(eventRequest.getParticipantLimit());
         event.setRequestModeration(eventRequest.isRequestModeration());
@@ -95,11 +103,13 @@ public class EventMapper {
         return event;
     }
 
-    private EventFullDto.Comment toEventFullDtoComment(Comment comment) {
-        return new EventFullDto.Comment(
+    private CommentDto toEventFullDtoComment(Comment comment) {
+        return new CommentDto(
                 comment.getId(),
                 comment.getContent(),
-                new EventFullDto.User(comment.getUser().getId(), comment.getUser().getName()),
+                comment.getStatus(),
+                new UserShortDto(comment.getUser().getId(), comment.getUser().getName()),
+                new EventShortDto(),
                 comment.getCreated()
         );
     }

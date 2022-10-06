@@ -9,10 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.dto.ParticipationRequestDto;
-import ru.practicum.ewmservice.exception.EventParticipantLimitException;
-import ru.practicum.ewmservice.exception.EventStateException;
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
-import ru.practicum.ewmservice.exception.UserHaveNoRightsException;
 import ru.practicum.ewmservice.mapper.ParticipationRequestMapper;
 import ru.practicum.ewmservice.model.ParticipationRequest;
 import ru.practicum.ewmservice.service.ParticipationRequestService;
@@ -31,7 +27,7 @@ public class ParticipationRequestController {
     private final ParticipationRequestMapper participationRequestMapper;
 
     @GetMapping("/users/{userId}/requests")
-    public Collection<ParticipationRequestDto> getByUserId(@PathVariable long userId) throws ObjectNotFountException {
+    public Collection<ParticipationRequestDto> getByUserId(@PathVariable long userId) {
         return participationRequestService.getByUserId(userId)
                 .stream()
                 .map(participationRequestMapper::toParticipationRequestDto)
@@ -40,15 +36,13 @@ public class ParticipationRequestController {
 
     @PostMapping("/users/{userId}/requests")
     public ParticipationRequestDto create(@PathVariable long userId,
-                                          @RequestParam long eventId)
-            throws ObjectNotFountException, EventStateException, UserHaveNoRightsException, EventParticipantLimitException {
+                                          @RequestParam long eventId) {
         ParticipationRequest participationRequest = participationRequestService.create(userId, eventId);
         return participationRequestMapper.toParticipationRequestDto(participationRequest);
     }
 
     @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
-    public ParticipationRequestDto cancel(@PathVariable long userId, @PathVariable long requestId)
-            throws ObjectNotFountException {
+    public ParticipationRequestDto cancel(@PathVariable long userId, @PathVariable long requestId) {
         ParticipationRequest participationRequest = participationRequestService.cancelParticipationRequest(userId,
                 requestId);
         return participationRequestMapper.toParticipationRequestDto(participationRequest);

@@ -1,9 +1,9 @@
 package ru.practicum.ewmservice.exception;
 
 /**
- * Исключение записывающее логи
+ * Базовое исключение
  */
-public abstract class BaseException extends Exception {
+public abstract class BaseException extends RuntimeException {
     private final String method;
 
     public BaseException(String message, String method) {

@@ -26,14 +26,14 @@ public class EventFullDto {
     @NonNull
     private String annotation;
     @NonNull
-    private Category category;
+    private CategoryDto category;
     private Integer confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
     @NonNull
     private LocalDateTime eventDate;
     @NonNull
-    private User initiator;
+    private UserShortDto initiator;
     @NonNull
     private Location location;
     @NonNull
@@ -43,42 +43,5 @@ public class EventFullDto {
     private Boolean requestModeration;
     private EventState state;
     private Long views;
-    private Collection<Comment> comments = new ArrayList<>();
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Category {
-        private Long id;
-        private String name;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class User {
-        private Long id;
-        private String name;
-    }
-
-    /**
-     * Широта и долгота места проведения события
-     */
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Location {
-        private Float lat;
-        private Float lon;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Comment {
-        private Long id;
-        private String content;
-        private User user;
-        private LocalDateTime created;
-    }
+    private Collection<CommentDto> comments = new ArrayList<>();
 }

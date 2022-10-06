@@ -1,18 +1,16 @@
 package ru.practicum.ewmservice.service;
 
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
-import ru.practicum.ewmservice.exception.UserHaveNoRightsException;
 import ru.practicum.ewmservice.model.Comment;
 
 public interface CommentService {
 
-    Comment create(long userId, long eventId, Comment comment) throws ObjectNotFountException;
+    Comment create(long userId, long eventId, Comment comment);
 
-    void delete(long userId, long commentId) throws ObjectNotFountException, UserHaveNoRightsException;
+    void delete(long userId, long commentId);
 
-    Comment publish(long commentId) throws ObjectNotFountException;
+    Comment publish(long commentId);
 
-    Comment reject(long commentId) throws ObjectNotFountException;
+    Comment reject(long commentId);
 
-    Comment getById(long id) throws ObjectNotFountException;
+    Comment getById(long id);
 }

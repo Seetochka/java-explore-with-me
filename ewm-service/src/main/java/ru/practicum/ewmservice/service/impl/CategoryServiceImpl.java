@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
 
     @Override
     @Transactional
-    public Category update(Category category) throws ObjectNotFountException {
+    public Category update(Category category) {
         if (!checkExistsById(category.getId())) {
             throw new ObjectNotFountException(
                     String.format("Категория с id %d не существует", category.getId()),
@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
 
     @Override
     @Transactional
-    public void delete(long id) throws ObjectNotFountException {
+    public void delete(long id) {
         if (!checkExistsById(id)) {
             throw new ObjectNotFountException(
                     String.format("Категория с id %d не существует", id),
@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService, PageTrait {
     }
 
     @Override
-    public Category getById(long id) throws ObjectNotFountException {
+    public Category getById(long id) {
         return categoryRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Категории с id %d не существует", id),
                 "GetCategoryById"

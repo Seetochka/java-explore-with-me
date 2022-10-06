@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.dto.UserDto;
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
 import ru.practicum.ewmservice.mapper.UserMapper;
 import ru.practicum.ewmservice.model.User;
 import ru.practicum.ewmservice.service.UserService;
@@ -47,7 +46,7 @@ public class AdminUserController {
     }
 
     @DeleteMapping("/{userId}")
-    public HttpStatus delete(@PathVariable long userId) throws ObjectNotFountException {
+    public HttpStatus delete(@PathVariable long userId) {
         userService.delete(userId);
         return HttpStatus.OK;
     }
