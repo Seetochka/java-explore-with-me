@@ -23,15 +23,4 @@ public class AdminUpdateEventRequestDto {
     private boolean paid;
     private int participantLimit;
     private boolean requestModeration;
-
-    /**
-     * Широта и долгота места проведения события
-     */
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Location {
-        private Float lat;
-        private Float lon;
-    }
 }

@@ -1,7 +1,13 @@
 package ru.practicum.statsservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.statsservice.dto.EndpointHitDto;
 import ru.practicum.statsservice.dto.ViewStats;
 import ru.practicum.statsservice.mapper.StatisticMapper;
@@ -21,8 +27,9 @@ public class StatisticController {
     private final StatisticMapper statisticMapper;
 
     @PostMapping("/hit")
-    public void createStat(@Valid @RequestBody EndpointHitDto endpointHit) {
+    public HttpStatus createStat(@Valid @RequestBody EndpointHitDto endpointHit) {
         statisticService.createStat(statisticMapper.toStat(endpointHit));
+        return HttpStatus.OK;
     }
 
     @GetMapping("/stats")

@@ -10,15 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import ru.practicum.ewmservice.client.EventClient;
 import ru.practicum.ewmservice.dto.ViewStats;
+import ru.practicum.ewmservice.enums.CommentStatus;
 import ru.practicum.ewmservice.enums.EventSort;
 import ru.practicum.ewmservice.enums.EventState;
 import ru.practicum.ewmservice.enums.ParticipationRequestStatus;
 import ru.practicum.ewmservice.exception.EventStateException;
 import ru.practicum.ewmservice.exception.ObjectNotFountException;
 import ru.practicum.ewmservice.exception.UserHaveNoRightsException;
+import ru.practicum.ewmservice.model.Category;
 import ru.practicum.ewmservice.model.Event;
 import ru.practicum.ewmservice.model.ParticipationRequest;
 import ru.practicum.ewmservice.model.User;
+import ru.practicum.ewmservice.repository.CommentRepository;
 import ru.practicum.ewmservice.repository.EventRepository;
 import ru.practicum.ewmservice.repository.ParticipationRequestsRepository;
 import ru.practicum.ewmservice.service.CategoryService;
@@ -35,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -50,48 +54,34 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
 
     private final EventRepository eventRepository;
     private final ParticipationRequestsRepository participationRequestsRepository;
+    private final CommentRepository commentRepository;
 
     private final EventClient eventClient;
 
     @Override
     @Transactional
-    public Event create(long userId, Event event) throws ObjectNotFountException {
-        if (!categoryService.checkExistsById(event.getCategory().getId())) {
-            throw new ObjectNotFountException(
-                    String.format("Категория с id %d не существует", event.getCategory().getId()),
-                    "CreateEvent"
-            );
-        }
-
+    public Event create(long userId, Event event) {
+        Category category = categoryService.getById(event.getCategory().getId());
         User user = userService.getById(userId);
-
         event.setInitiator(user);
+        event.setCategory(category);
         event.setState(EventState.PENDING);
         event.setPublishedOn(null);
         event.setCreatedAt(LocalDateTime.now());
         event.setUpdatedAt(LocalDateTime.now());
-
         event = eventRepository.save(event);
-
         log.info("CreateEvent. Создано событие с id {}", event.getId());
         return event;
     }
 
     @Override
     @Transactional
-    public Event updateAdmin(long eventId, Event event) throws ObjectNotFountException {
-        if (!categoryService.checkExistsById(event.getCategory().getId())) {
-            throw new ObjectNotFountException(
-                    String.format("Категория с id %d не существует", event.getCategory().getId()),
-                    "UpdateEventAdmin"
-            );
-        }
-
-        Event eventUpdated = getById(event.getId());
-
+    public Event updateAdmin(long eventId, Event event) {
+        Category category = categoryService.getById(event.getCategory().getId());
+        Event eventUpdated = getByIdOrThrow(event.getId());
         eventUpdated.setTitle(event.getTitle());
         eventUpdated.setAnnotation(event.getAnnotation());
-        eventUpdated.setCategory(event.getCategory());
+        eventUpdated.setCategory(category);
         eventUpdated.setDescription(event.getDescription());
         eventUpdated.setEventDate(event.getEventDate());
         eventUpdated.setLat(event.getLat());
@@ -100,16 +90,14 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         eventUpdated.setParticipantLimit(event.getParticipantLimit());
         eventUpdated.setRequestModeration(event.getRequestModeration());
         eventUpdated.setUpdatedAt(LocalDateTime.now());
-
         eventUpdated = eventRepository.save(eventUpdated);
-
         log.info("UpdateEventAdmin. Обновлено событие с id {}", event.getId());
         return eventUpdated;
     }
 
     @Override
     @Transactional
-    public Event updateUser(long userId, Event event) throws ObjectNotFountException, UserHaveNoRightsException {
+    public Event updateUser(long userId, Event event) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -117,15 +105,8 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
             );
         }
 
-        if (!categoryService.checkExistsById(event.getCategory().getId())) {
-            throw new ObjectNotFountException(
-                    String.format("Категория с id %d не существует", event.getCategory().getId()),
-                    "UpdateEventUser"
-            );
-        }
-
-        Event eventUpdated = getById(event.getId());
-
+        Category category = categoryService.getById(event.getCategory().getId());
+        Event eventUpdated = getByIdOrThrow(event.getId());
         if (userId != eventUpdated.getInitiator().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не имеет прав редактировать событие с id %d", userId,
@@ -136,50 +117,41 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
 
         eventUpdated.setTitle(event.getTitle());
         eventUpdated.setAnnotation(event.getAnnotation());
-        eventUpdated.setCategory(event.getCategory());
+        eventUpdated.setCategory(category);
         eventUpdated.setDescription(event.getDescription());
         eventUpdated.setEventDate(event.getEventDate());
         eventUpdated.setPaid(event.getPaid());
         eventUpdated.setParticipantLimit(event.getParticipantLimit());
         eventUpdated.setUpdatedAt(LocalDateTime.now());
-
         eventUpdated = eventRepository.save(eventUpdated);
-
         log.info("UpdateEventUser. Обновлено событие с id {}", event.getId());
         return eventUpdated;
     }
 
     @Override
     @Transactional
-    public Event publish(long eventId) throws ObjectNotFountException {
-        Event event = getById(eventId);
-
+    public Event publish(long eventId) {
+        Event event = getByIdOrThrow(eventId);
         event.setState(EventState.PUBLISHED);
         event.setPublishedOn(LocalDateTime.now());
-
         event = eventRepository.save(event);
-
         log.info("PublishEvent. Опубликовано событие с id {}", event.getId());
         return event;
     }
 
     @Override
     @Transactional
-    public Event reject(long eventId) throws ObjectNotFountException {
-        Event event = getById(eventId);
-
+    public Event reject(long eventId) {
+        Event event = getByIdOrThrow(eventId);
         event.setState(EventState.CANCELED);
-
         event = eventRepository.save(event);
-
         log.info("RejectEvent. Отклонено событие с id {}", event.getId());
         return event;
     }
 
     @Override
     @Transactional
-    public Event cancelEvent(long userId, long eventId) throws ObjectNotFountException, UserHaveNoRightsException,
-            EventStateException {
+    public Event cancelEvent(long userId, long eventId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -187,8 +159,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
             );
         }
 
-        Event event = getById(eventId);
-
+        Event event = getByIdOrThrow(eventId);
         if (userId != event.getInitiator().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не имеет прав редактировать событие с id %d", userId,
@@ -206,17 +177,14 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         event.setState(EventState.CANCELED);
-
         event = eventRepository.save(event);
-
         log.info("CancelEvent. Отменено событие с id {}", event.getId());
         return event;
     }
 
     @Override
     @Transactional
-    public ParticipationRequest confirmParticipationRequest(long userId, long eventId, long reqId)
-            throws ObjectNotFountException {
+    public ParticipationRequest confirmParticipationRequest(long userId, long eventId, long reqId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -232,19 +200,15 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         ParticipationRequest participationRequest = participationRequestService.getById(reqId);
-
         participationRequest.setStatus(ParticipationRequestStatus.CONFIRMED);
-
         participationRequest = participationRequestsRepository.save(participationRequest);
-
         log.info("ConfirmParticipationRequest. Подтверждение заявки на участии с id {}", reqId);
         return participationRequest;
     }
 
     @Override
     @Transactional
-    public ParticipationRequest rejectParticipationRequest(long userId, long eventId, long reqId)
-            throws ObjectNotFountException {
+    public ParticipationRequest rejectParticipationRequest(long userId, long eventId, long reqId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -260,11 +224,8 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         ParticipationRequest participationRequest = participationRequestService.getById(reqId);
-
         participationRequest.setStatus(ParticipationRequestStatus.REJECTED);
-
         participationRequest = participationRequestsRepository.save(participationRequest);
-
         log.info("RejectParticipationRequest. Отклонение заявки на участии с id {}", reqId);
         return participationRequest;
     }
@@ -275,10 +236,8 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                                                  String rangeEnd, int from, int size) {
         LocalDateTime start = convertStringToLocalDateTime(rangeStart, null);
         LocalDateTime end = convertStringToLocalDateTime(rangeEnd, null);
-
         Pageable page = getPage(from, size, "id", Sort.Direction.ASC);
         Specification<Event> specification = null;
-
         if (users != null && !users.isEmpty()) {
             specification = Specification.where(specification).and(
                     (root, criteriaQuery, criteriaBuilder) ->
@@ -325,12 +284,10 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                                                 EventSort sort, int from, int size) {
         LocalDateTime start = convertStringToLocalDateTime(rangeStart, null);
         LocalDateTime end = convertStringToLocalDateTime(rangeEnd, null);
-
         Specification<Event> specification = Specification.where(
                 (root, criteriaQuery, criteriaBuilder) ->
                         criteriaBuilder.equal(root.get("state"), EventState.PUBLISHED)
         );
-
         if (StringUtils.hasText(text)) {
             Specification<Event> specificationSearch = Specification.where(
                     (root, criteriaQuery, criteriaBuilder) ->
@@ -388,7 +345,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                     (root, criteriaQuery, criteriaBuilder) ->
                             criteriaBuilder.equal(root.get("participantLimit"), 0)
             );
-
             specificationAvailable = Specification.where(specificationAvailable)
                     .or(
                             (root, criteriaQuery, criteriaBuilder) -> {
@@ -401,7 +357,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                                 return criteriaBuilder.lessThan(sub, root.get("participantLimit"));
                             }
                     );
-
             specification = Specification.where(specification)
                     .and(specificationAvailable);
         }
@@ -410,7 +365,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                 .stream()
                 .map(this::prepareEvent)
                 .collect(Collectors.toList());
-
         if (sort.equals(EventSort.EVENT_DATE)) {
             return result.stream()
                     .sorted(Comparator.comparing(Event::getViews))
@@ -434,17 +388,21 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
-    public Event getById(long id) throws ObjectNotFountException {
+    public Event getByIdOrThrow(long id) {
         Event event = eventRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", id),
                 "GetEventById"
         ));
-
         return prepareEvent(event);
     }
 
     @Override
-    public Collection<Event> getByUserId(long userId, int from, int size) throws ObjectNotFountException {
+    public Optional<Event> getById(long id) {
+        return eventRepository.findById(id);
+    }
+
+    @Override
+    public Collection<Event> getByUserId(long userId, int from, int size) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -453,7 +411,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         Pageable page = getPage(from, size, "id", Sort.Direction.ASC);
-
         return eventRepository.findAllByInitiatorId(userId, page)
                 .stream()
                 .map(this::prepareEvent)
@@ -461,8 +418,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
-    public Event getByUserIdAndEventId(long userId, long eventId) throws ObjectNotFountException,
-            UserHaveNoRightsException {
+    public Event getByUserIdAndEventId(long userId, long eventId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -474,7 +430,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
                 String.format("Событие с id %d не существует", eventId),
                 "GetByUserIdAndEventId"
         ));
-
         if (userId != event.getInitiator().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не имеет прав редактировать событие с id %d", userId,
@@ -487,8 +442,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
     }
 
     @Override
-    public Collection<ParticipationRequest> getRequestsByEventId(long userId, long eventId)
-            throws ObjectNotFountException {
+    public Collection<ParticipationRequest> getRequestsByEventId(long userId, long eventId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -513,7 +467,6 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
 
     private Event prepareEvent(Event event) {
         Collection<ViewStats> viewStats = eventClient.getStats(List.of("/events/" + event.getId()));
-
         if (!viewStats.isEmpty()) {
             event.setViews(
                     viewStats.stream()
@@ -524,6 +477,7 @@ public class EventServiceImpl implements EventService, PageTrait, DateTimeConver
         }
 
         event.setConfirmedRequests(participationRequestService.getCountParticipantByEventId(event.getId()));
+        event.setComments(commentRepository.findAllByStatusAndEventId(CommentStatus.PUBLISHED, event.getId()));
 
         return event;
     }

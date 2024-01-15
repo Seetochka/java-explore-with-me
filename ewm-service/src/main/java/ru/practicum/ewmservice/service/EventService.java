@@ -2,31 +2,29 @@ package ru.practicum.ewmservice.service;
 
 import ru.practicum.ewmservice.enums.EventSort;
 import ru.practicum.ewmservice.enums.EventState;
-import ru.practicum.ewmservice.exception.EventStateException;
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
-import ru.practicum.ewmservice.exception.UserHaveNoRightsException;
 import ru.practicum.ewmservice.model.Event;
 import ru.practicum.ewmservice.model.ParticipationRequest;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface EventService {
 
-    Event create(long userId, Event event) throws ObjectNotFountException;
+    Event create(long userId, Event event);
 
-    Event updateAdmin(long eventId, Event event) throws ObjectNotFountException;
+    Event updateAdmin(long eventId, Event event);
 
-    Event updateUser(long userId, Event event) throws ObjectNotFountException, UserHaveNoRightsException;
+    Event updateUser(long userId, Event event);
 
-    Event publish(long eventId) throws ObjectNotFountException;
+    Event publish(long eventId);
 
-    Event reject(long eventId) throws ObjectNotFountException;
+    Event reject(long eventId);
 
-    Event cancelEvent(long userId, long eventId) throws ObjectNotFountException, UserHaveNoRightsException, EventStateException;
+    Event cancelEvent(long userId, long eventId);
 
-    ParticipationRequest confirmParticipationRequest(long userId, long eventId, long reqId) throws ObjectNotFountException;
+    ParticipationRequest confirmParticipationRequest(long userId, long eventId, long reqId);
 
-    ParticipationRequest rejectParticipationRequest(long userId, long eventId, long reqId) throws ObjectNotFountException;
+    ParticipationRequest rejectParticipationRequest(long userId, long eventId, long reqId);
 
     Collection<Event> getByParamsForAdmin(Collection<Long> users, Collection<EventState> states, Collection<Long> categories,
                                           String rangeStart, String rangeEnd, int from, int size);
@@ -35,13 +33,15 @@ public interface EventService {
                                          String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                          EventSort sort, int from, int size);
 
-    Event getById(long id) throws ObjectNotFountException;
+    Event getByIdOrThrow(long id);
 
-    Collection<Event> getByUserId(long userId, int from, int size) throws ObjectNotFountException;
+    Optional<Event> getById(long id);
 
-    Event getByUserIdAndEventId(long userId, long eventId) throws ObjectNotFountException, UserHaveNoRightsException;
+    Collection<Event> getByUserId(long userId, int from, int size);
 
-    Collection<ParticipationRequest> getRequestsByEventId(long userId, long eventId) throws ObjectNotFountException;
+    Event getByUserIdAndEventId(long userId, long eventId);
+
+    Collection<ParticipationRequest> getRequestsByEventId(long userId, long eventId);
 
     boolean checkExistsById(long id);
 }

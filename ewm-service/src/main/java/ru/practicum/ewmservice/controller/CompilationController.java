@@ -1,9 +1,12 @@
 package ru.practicum.ewmservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewmservice.dto.CompilationDto;
-import ru.practicum.ewmservice.exception.ObjectNotFountException;
 import ru.practicum.ewmservice.mapper.CompilationMapper;
 import ru.practicum.ewmservice.service.CompilationService;
 
@@ -31,7 +34,7 @@ public class CompilationController {
     }
 
     @GetMapping("/compilations/{compId}")
-    public CompilationDto getById(@PathVariable long compId) throws ObjectNotFountException {
+    public CompilationDto getById(@PathVariable long compId) {
         return compilationMapper.toCompilationDto(compilationService.getById(compId));
     }
 }

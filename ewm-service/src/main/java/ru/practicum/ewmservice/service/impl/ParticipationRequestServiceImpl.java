@@ -35,15 +35,12 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     @Transactional
-    public ParticipationRequest create(long userId, long eventId)
-            throws ObjectNotFountException, UserHaveNoRightsException, EventStateException, EventParticipantLimitException {
+    public ParticipationRequest create(long userId, long eventId) {
         User user = userService.getById(userId);
-
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Событие с id %d не существует", eventId),
                 "CreateParticipationRequest"
         ));
-
         if (userId == event.getInitiator().getId()) {
             throw new UserHaveNoRightsException(
                     String.format("Пользователь с id %d не может добавить запрос на участие в своем событии", userId),
@@ -68,7 +65,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         }
 
         ParticipationRequest participationRequest = new ParticipationRequest();
-
         if (event.getRequestModeration()) {
             participationRequest.setStatus(ParticipationRequestStatus.PENDING);
         } else {
@@ -78,16 +74,14 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         participationRequest.setRequester(user);
         participationRequest.setEvent(event);
         participationRequest.setCreated(LocalDateTime.now());
-
         participationRequest = participationRequestsRepository.save(participationRequest);
-
         log.info("CreateParticipationRequest. Создан запрос на участие с id {}", participationRequest.getId());
         return participationRequest;
     }
 
     @Override
     @Transactional
-    public ParticipationRequest cancelParticipationRequest(long userId, long requestId) throws ObjectNotFountException {
+    public ParticipationRequest cancelParticipationRequest(long userId, long requestId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
@@ -103,17 +97,14 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         }
 
         ParticipationRequest participationRequest = getById(requestId);
-
         participationRequest.setStatus(ParticipationRequestStatus.CANCELED);
-
         participationRequest = participationRequestsRepository.save(participationRequest);
-
         log.info("CancelParticipationRequest. Отменен запрос на участие с id {}", participationRequest.getId());
         return participationRequest;
     }
 
     @Override
-    public ParticipationRequest getById(long id) throws ObjectNotFountException {
+    public ParticipationRequest getById(long id) {
         return participationRequestsRepository.findById(id).orElseThrow(() -> new ObjectNotFountException(
                 String.format("Запрос на участие с id %d не существует", id),
                 "GetParticipationRequestById"
@@ -121,7 +112,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     }
 
     @Override
-    public Collection<ParticipationRequest> getByUserId(long userId) throws ObjectNotFountException {
+    public Collection<ParticipationRequest> getByUserId(long userId) {
         if (!userService.checkExistsById(userId)) {
             throw new ObjectNotFountException(
                     String.format("Пользователь с id %d не существует", userId),
